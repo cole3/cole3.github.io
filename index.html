@@ -187,130 +187,7 @@ strne    r6, [r3]
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://cole3.github.io/2017/05/07/Linux-kernel-linear-mmap-area/" data-id="cj2es9anf0001eke7c61rcfxz" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Linux_kernel_linear_mmap_area" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/05/06/Linux_kernel_linear_mmap_area/" class="article-date">
-  <time datetime="2017-05-06T02:13:13.953Z" itemprop="datePublished">2017-05-06</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>#Linux kernel 线性映射区</p>
-<p>（32 bit case）</p>
-<p>在kernel启动时，mmu从关闭状态到打开状态，需要为mmu准备page table。下面是详细描述建表过程：</p>
-<p>##建立临时映射表</p>
-<p>首先提到一个重要的文件head.S，这个文件包含了Kernel startup entry point：</p>
-<pre><code>    __HEAD
-ENTRY(stext)
-</code></pre><p>此时的mmu处于关闭状态，不过因为C函数的地址和变量地址都是虚拟地址，所以在进入C world之前，要建立映射表，然后开机mmu，在stext中有体现：</p>
-<pre><code>    bl    __create_page_tables
-//...
-1:    b    __enable_mmu
-</code></pre><p>###__create_page_tables</p>
-<p>这个函数的作用是建立mmu的page table，当然在这段汇编里，只建立能刚好满足kernel运行的page table，剩下的交给强大的C语言完成，所以这个页表被叫做“临时映射表”。</p>
-<p>这个函数分成三大部分：</p>
-<ol>
-<li>Create identity mapping to cater for __enable_mmu</li>
-<li>Map our RAM from the start to the end of the kernel</li>
-<li>Then map boot params address in r2 if specified</li>
-</ol>
-<h4 id="1-Create-identity-mapping-to-cater-for-enable-mmu"><a href="#1-Create-identity-mapping-to-cater-for-enable-mmu" class="headerlink" title="1. Create identity mapping to cater for __enable_mmu"></a>1. Create identity mapping to cater for __enable_mmu</h4><pre><code>    /*
-     * Create identity mapping to cater for __enable_mmu.
-     * This identity mapping will be removed by paging_init().
-     */
-    adr    r0, __turn_mmu_on_loc
-    ldmia    r0, {r3, r5, r6}
-    sub    r0, r0, r3            @ virt-&gt;phys offset
-    add    r5, r5, r0            @ phys __turn_mmu_on
-    add    r6, r6, r0            @ phys __turn_mmu_on_end
-    mov    r5, r5, lsr #SECTION_SHIFT
-    mov    r6, r6, lsr #SECTION_SHIFT
-
-1:    orr    r3, r7, r5, lsl #SECTION_SHIFT    @ flags + kernel base //制作pgd表项
-    str    r3, [r4, r5, lsl #PMD_ORDER]    @ identity mapping //存储pgd表项
-    cmp    r5, r6
-    addlo    r5, r5, #1            @ next section
-    blo    1b
-</code></pre><p>创建同一映射，也被称为平映射，该映射的特点是：虚拟地址和物理地址相同。</p>
-<p>映射区间为 <code>__turn_mmu_on</code> 到 <code>__turn_mmu_on_end</code>，按section方式进行映射1MB空间（如果该函数敲好在1MB边界上，则映射2MB）。<code>__turn_mmu_on</code>函数实现：</p>
-<pre><code>/*
- * Enable the MMU.  This completely changes the structure of the visible
- * memory space.  You will not be able to trace execution through this.
- * If you have an enquiry about this, *please* check the linux-arm-kernel
- * mailing list archives BEFORE sending another post to the list.
- *
- *  r0  = cp#15 control register
- *  r1  = machine ID
- *  r2  = atags or dtb pointer
- *  r9  = processor ID
- *  r13 = *virtual* address to jump to upon completion
- *
- * other registers depend on the function called upon completion
- */
-    .align    5
-    .pushsection    .idmap.text, &quot;ax&quot;
-ENTRY(__turn_mmu_on)
-    mov    r0, r0
-    instr_sync
-    mcr    p15, 0, r0, c1, c0, 0        @ write control reg
-    mrc    p15, 0, r3, c0, c0, 0        @ read id reg
-    instr_sync
-    mov    r3, r3
-    mov    r3, r13
-    mov    pc, r3
-__turn_mmu_on_end:
-ENDPROC(__turn_mmu_on)
-    .popsection
-</code></pre><p>在write control reg之后，mmu就被打开了，下条指令的PC值，指向的位置仍然是之前的物理地址+4。当cpu执行新的PC值指向的指令时，就要利用MMU访问内存，由于之前制作了虚拟地址和物理地址的同一映射，所以新的物理地址和虚拟地址相同，所以平滑过渡了打开mmu造成的地址映射问题。</p>
-<p>####2. Map our RAM from the start to the end of the kernel</p>
-<pre><code>    /*
-     * Map our RAM from the start to the end of the kernel .bss section.
-     */
-    add    r0, r4, #PAGE_OFFSET &gt;&gt; (SECTION_SHIFT - PMD_ORDER)
-    ldr    r6, =(_end - 1)
-    orr    r3, r8, r7 //制作pgd表项内容
-    add    r6, r4, r6, lsr #(SECTION_SHIFT - PMD_ORDER)
-1:    str    r3, [r0], #1 &lt;&lt; PMD_ORDER //存储pgd表项
-    add    r3, r3, #1 &lt;&lt; SECTION_SHIFT
-    cmp    r0, r6
-    bls    1b
-</code></pre><p>利用section方式，完成kernel线性区的映射，线性区的范围是PAGE_OFFSET到kernel .bss段的结束。</p>
-<p>####3. Then map boot params address in r2 if specified</p>
-<pre><code>/*
- * Then map boot params address in r2 if specified.
- * We map 2 sections in case the ATAGs/DTB crosses a section boundary.
- */
-mov    r0, r2, lsr #SECTION_SHIFT
-movs    r0, r0, lsl #SECTION_SHIFT
-subne    r3, r0, r8
-addne    r3, r3, #PAGE_OFFSET
-addne    r3, r4, r3, lsr #(SECTION_SHIFT - PMD_ORDER)
-orrne    r6, r7, r0
-strne    r6, [r3], #1 &lt;&lt; PMD_ORDER
-addne    r6, r6, #1 &lt;&lt; SECTION_SHIFT
-strne    r6, [r3]
-</code></pre><p>利用section方式，映射了dtb空间，映射大小为两个sections（2MB），原因是避免dtb跨section的问题。</p>
-<p>至此，临时映射表已经键完，之后call <code>__enable_mmu</code> 函数，调用 <code>__turn_mmu_on</code> 打开MMU，终于进入C world。</p>
-<p>##建立最终线性页表</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://cole3.github.io/2017/05/06/Linux_kernel_linear_mmap_area/" data-id="cj2es9ans0002eke7qee03b3k" class="article-share-link">Share</a>
+      <a data-url="https://cole3.github.io/2017/05/07/Linux-kernel-linear-mmap-area/" data-id="cj2ese0za0000hse7l6pgubxx" class="article-share-link">Share</a>
       
       
     </footer>
@@ -347,7 +224,7 @@ strne    r6, [r3]
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://cole3.github.io/2017/04/23/Welcome-cole3-s-blog/" data-id="cj2es9amx0000eke7qzh4faoc" class="article-share-link">Share</a>
+      <a data-url="https://cole3.github.io/2017/04/23/Welcome-cole3-s-blog/" data-id="cj2ese1050002hse72d8htwxg" class="article-share-link">Share</a>
       
       
     </footer>
@@ -392,7 +269,7 @@ strne    r6, [r3]
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://cole3.github.io/2017/04/23/hello-world/" data-id="cj2es9anw0003eke7a53yo6dn" class="article-share-link">Share</a>
+      <a data-url="https://cole3.github.io/2017/04/23/hello-world/" data-id="cj2ese10b0003hse77h5xawvn" class="article-share-link">Share</a>
       
       
     </footer>
@@ -433,10 +310,6 @@ strne    r6, [r3]
         
           <li>
             <a href="/2017/05/07/Linux-kernel-linear-mmap-area/">Linux kernel linear mmap area</a>
-          </li>
-        
-          <li>
-            <a href="/2017/05/06/Linux_kernel_linear_mmap_area/">(no title)</a>
           </li>
         
           <li>
