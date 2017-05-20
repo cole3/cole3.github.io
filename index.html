@@ -200,7 +200,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
-            Startseite
+            Home
           </a>
         </li>
       
@@ -210,7 +210,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
-            Archiv
+            Archives
           </a>
         </li>
       
@@ -243,6 +243,246 @@
           <div id="content" class="content">
             
   <section id="posts" class="posts-expand">
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://cole3.github.io/2017/05/07/Linux-kernel-linear-mmap-area/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="cole3">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="cole3's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/05/07/Linux-kernel-linear-mmap-area/" itemprop="url">
+                  Linux kernel linear mmap area
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-07T22:13:03+08:00">
+                2017-05-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Linux-kernel-线性映射区"><a href="#Linux-kernel-线性映射区" class="headerlink" title="Linux kernel 线性映射区"></a>Linux kernel 线性映射区</h1><p>（32 bit case）</p>
+<p>在kernel启动时，mmu从关闭状态到打开状态，需要为mmu准备page table。下面是详细描述建表过程：</p>
+<h2 id="建立临时映射表"><a href="#建立临时映射表" class="headerlink" title="建立临时映射表"></a>建立临时映射表</h2><p>首先提到一个重要的文件head.S，这个文件包含了Kernel startup entry point：</p>
+<pre><code>    __HEAD
+ENTRY(stext)
+</code></pre><p>此时的mmu处于关闭状态，不过因为C函数的地址和变量地址都是虚拟地址，所以在进入C world之前，要建立映射表，然后开机mmu，在stext中有体现：</p>
+<pre><code>    bl    __create_page_tables
+//...
+1:    b    __enable_mmu
+</code></pre><h3 id="create-page-tables"><a href="#create-page-tables" class="headerlink" title="__create_page_tables"></a>__create_page_tables</h3><p>这个函数的作用是建立mmu的page table，当然在这段汇编里，只建立能刚好满足kernel运行的page table，剩下的交给强大的C语言完成，所以这个页表被叫做“临时映射表”。</p>
+<p>这个函数分成三大部分：</p>
+<ol>
+<li>Create identity mapping to cater for __enable_mmu</li>
+<li>Map our RAM from the start to the end of the kernel</li>
+<li>Then map boot params address in r2 if specified</li>
+</ol>
+<h4 id="1-Create-identity-mapping-to-cater-for-enable-mmu"><a href="#1-Create-identity-mapping-to-cater-for-enable-mmu" class="headerlink" title="1. Create identity mapping to cater for __enable_mmu"></a>1. Create identity mapping to cater for __enable_mmu</h4><pre><code>    /*
+     * Create identity mapping to cater for __enable_mmu.
+     * This identity mapping will be removed by paging_init().
+     */
+    adr    r0, __turn_mmu_on_loc
+    ldmia    r0, {r3, r5, r6}
+    sub    r0, r0, r3            @ virt-&gt;phys offset
+    add    r5, r5, r0            @ phys __turn_mmu_on
+    add    r6, r6, r0            @ phys __turn_mmu_on_end
+    mov    r5, r5, lsr #SECTION_SHIFT
+    mov    r6, r6, lsr #SECTION_SHIFT
+
+1:    orr    r3, r7, r5, lsl #SECTION_SHIFT    @ flags + kernel base //制作pgd表项
+    str    r3, [r4, r5, lsl #PMD_ORDER]    @ identity mapping //存储pgd表项
+    cmp    r5, r6
+    addlo    r5, r5, #1            @ next section
+    blo    1b
+</code></pre><p>创建同一映射，也被称为平映射，该映射的特点是：虚拟地址和物理地址相同。</p>
+<p>映射区间为 <code>__turn_mmu_on</code> 到 <code>__turn_mmu_on_end</code>，按section方式进行映射1MB空间（如果该函数敲好在1MB边界上，则映射2MB）。<code>__turn_mmu_on</code>函数实现：</p>
+<pre><code>/*
+ * Enable the MMU.  This completely changes the structure of the visible
+ * memory space.  You will not be able to trace execution through this.
+ * If you have an enquiry about this, *please* check the linux-arm-kernel
+ * mailing list archives BEFORE sending another post to the list.
+ *
+ *  r0  = cp#15 control register
+ *  r1  = machine ID
+ *  r2  = atags or dtb pointer
+ *  r9  = processor ID
+ *  r13 = *virtual* address to jump to upon completion
+ *
+ * other registers depend on the function called upon completion
+ */
+    .align    5
+    .pushsection    .idmap.text, &quot;ax&quot;
+ENTRY(__turn_mmu_on)
+    mov    r0, r0
+    instr_sync
+    mcr    p15, 0, r0, c1, c0, 0        @ write control reg
+    mrc    p15, 0, r3, c0, c0, 0        @ read id reg
+    instr_sync
+    mov    r3, r3
+    mov    r3, r13
+    mov    pc, r3
+__turn_mmu_on_end:
+ENDPROC(__turn_mmu_on)
+    .popsection
+</code></pre><p>在write control reg之后，mmu就被打开了，下条指令的PC值，指向的位置仍然是之前的物理地址+4。当cpu执行新的PC值指向的指令时，就要利用MMU访问内存，由于之前制作了虚拟地址和物理地址的同一映射，所以新的物理地址和虚拟地址相同，所以平滑过渡了打开mmu造成的地址映射问题。</p>
+<h4 id="2-Map-our-RAM-from-the-start-to-the-end-of-the-kernel"><a href="#2-Map-our-RAM-from-the-start-to-the-end-of-the-kernel" class="headerlink" title="2. Map our RAM from the start to the end of the kernel"></a>2. Map our RAM from the start to the end of the kernel</h4><pre><code>    /*
+     * Map our RAM from the start to the end of the kernel .bss section.
+     */
+    add    r0, r4, #PAGE_OFFSET &gt;&gt; (SECTION_SHIFT - PMD_ORDER)
+    ldr    r6, =(_end - 1)
+    orr    r3, r8, r7 //制作pgd表项内容
+    add    r6, r4, r6, lsr #(SECTION_SHIFT - PMD_ORDER)
+1:    str    r3, [r0], #1 &lt;&lt; PMD_ORDER //存储pgd表项
+    add    r3, r3, #1 &lt;&lt; SECTION_SHIFT
+    cmp    r0, r6
+    bls    1b
+</code></pre><p>利用section方式，完成kernel线性区的映射，线性区的范围是PAGE_OFFSET到kernel .bss段的结束。</p>
+<h4 id="3-Then-map-boot-params-address-in-r2-if-specified"><a href="#3-Then-map-boot-params-address-in-r2-if-specified" class="headerlink" title="3. Then map boot params address in r2 if specified"></a>3. Then map boot params address in r2 if specified</h4><pre><code>/*
+ * Then map boot params address in r2 if specified.
+ * We map 2 sections in case the ATAGs/DTB crosses a section boundary.
+ */
+mov    r0, r2, lsr #SECTION_SHIFT
+movs    r0, r0, lsl #SECTION_SHIFT
+subne    r3, r0, r8
+addne    r3, r3, #PAGE_OFFSET
+addne    r3, r4, r3, lsr #(SECTION_SHIFT - PMD_ORDER)
+orrne    r6, r7, r0
+strne    r6, [r3], #1 &lt;&lt; PMD_ORDER
+addne    r6, r6, #1 &lt;&lt; SECTION_SHIFT
+strne    r6, [r3]
+</code></pre><p>利用section方式，映射了dtb空间，映射大小为两个sections（2MB），原因是避免dtb跨section的问题。</p>
+<p>至此，临时映射表已经键完，之后call <code>__enable_mmu</code> 函数，调用 <code>__turn_mmu_on</code> 打开MMU，终于进入C world。</p>
+<h2 id="建立最终线性页表"><a href="#建立最终线性页表" class="headerlink" title="建立最终线性页表"></a>建立最终线性页表</h2><p>进入start_kernel后<br>paging_init</p>
+<p>-&gt; build_mem_type_table</p>
+<p><a href="http://blog.csdn.net/skyflying2012/article/details/51044705" target="_blank" rel="external">http://blog.csdn.net/skyflying2012/article/details/51044705</a></p>
+<p>arm的两级映射为12+8+12=32</p>
+<p>一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB），每个索引占4 bytes，这样16KB大小的页表就可以囊括32位CPU可以寻址到的最大4GB空间</p>
+<p>可以想象，查询这4096个索引，仅需32位虚拟地址的高12位，CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，即获取了该虚拟地址的页目录项。这个过程对于section-mapping和page-mapping都是一样的，那如何区分映射方式呢，关键在与页目录项的最低2bit，如下：</p>
+<p>1 section-mapping </p>
+<p>这一张图很清晰的说明了section-mapping方式的工作原理，根据高12位索引和TTB相加获取的页目录项，MMU发现低2位为10，是section-mapping，取该页目录项的高12位与虚拟地址的低20位拼接，就获取到了物理地址，完成转换。</p>
+<p>2 page-mapping </p>
+<p>这张图说明白了page-mapping方式中4K页的工作原理，是一个二级页表方式，可以细分为5步：<br>（1）MMU由CP15的C0取出TTB（页目录）基址，与VA（虚拟地址）高12位相加，获取该VA在页目录中的对应页目录项值。<br>（2）MMU获取页目录项最低2bit，是01，说明本次映射的1MB数据为4k小页的page-mapping。<br>（3）MMU获取页目录项的高22位（页表是256X4=1K，所以页表基址是1K对齐的）是页表基地址，与VA的中间8位相加，即该VA的对应页表项地址，从而获取VA对应的页表项值（page table entry）<br>（4）MMU获取页表项值的高20位，这就是该4K页对应的物理地址了，与VA低12位相加（也就是4K页内的偏移），这就是VA对应的物理地址了<br>（5）MMU访问该物理地址，进行CPU给出的读写操作</p>
+<p>更新的时机我的理解有4个： </p>
+<p>（1）内核启动初期开启MMU阶段临时内存页表的建立<br>（2）start_kernel中完整的静态内存页表的建立<br>（3）内核空间中动态映射页表的建立，如vmalloc ioremap dma_alloc_coherent等<br>（4）用户空间访问虚拟地址时的缺页异常处理函数do_page_fault</p>
+<p>内核的入口在head.S的stext中，进入start_kernel之前，大概经历了如下几步：</p>
+<p>1.将CPU工作模式设置成svc模式，屏蔽中断</p>
+<p>2.获取CPU ID，然后依据CPU ID查找对应的PROC INFO</p>
+<p>3.校验atags指针</p>
+<p>4.__create_page_tables 创建页表,本文重点的记录一下这部分内容</p>
+<p>页表初始化主要完成了三部分区域的映射。</p>
+<p>初始化过程如下。</p>
+<p>Step 1. 清零页表内容。</p>
+<p>页表的停放在内核镜像前的16K物理空间内，即（phys_offset+text_offset - page_dir_size,phys_offset + text_offset）区间内。</p>
+<p>这里的几个宏定义如下：</p>
+<p>page_dir_size：页表的大小</p>
+<p>phys_offset：代码中要求使用PLAT_PHYS_OFFSET这个宏，总之就是RAM的物理起始地址，比如tq2440中SDRAM挂在BANK6上，对应的值就是BANK6的物理地址。</p>
+<p>text_offset：内核镜像的开始地址</p>
+<p>Step 2, 映射 <strong>turn_mmu_on 到 </strong>turn_mmu_on_end这段空间，这段空间的物理地址与虚拟地址相同，即所谓的平映射。</p>
+<p><strong>turn_mmu_on到</strong>turn_mmu_on_end这段空间实际中就是一个特别短的一个函数，就在同一个1M空间内，对这段空间进行平映射是为了保证在开启MMU时，CPU的PC指针可以正常的执行，直到通过B命令跳转到内核使用的虚拟地址段上来。</p>
+<p>举个例子，假设开启MMU前的一瞬间，PC指向0x100这个物理地址，它的下一条指令，就是0x104，可是开启MMU之后,CPU发出的0x104地址就会被MMU“转译”,不做平映射的话，天知道它跑到哪儿去了。</p>
+<p>Step3. 映射内核虚拟地址空间到物理地址开始处。将内核虚拟地址的开始处（3G，0xc000 0000）到.bss段的结尾处（_end）这段空间，映射到物理RAM地址开始处对应的空间。</p>
+<p>Step4.映射atags附近2M空间到内核虚拟空间同样偏移的2M空间内。之所以映射2M是担心atag指向的内容（传给内核的参数）正好跨过一个section。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
     
       
 
@@ -290,7 +530,7 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Veröffentlicht am</span>
+                <span class="post-meta-item-text">Posted on</span>
               
               <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-23T22:17:43+08:00">
                 2017-04-23
@@ -410,7 +650,7 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Veröffentlicht am</span>
+                <span class="post-meta-item-text">Posted on</span>
               
               <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-23T21:52:56+08:00">
                 2017-04-23
@@ -537,8 +777,8 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">2</span>
-                <span class="site-state-item-name">Artikel</span>
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">posts</span>
               </a>
             </div>
           
@@ -592,7 +832,7 @@
 
 
 <div class="powered-by">
-  Erstellt mit  <a class="theme-link" href="https://hexo.io">Hexo</a>
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
 </div>
 
 <div class="theme-info">

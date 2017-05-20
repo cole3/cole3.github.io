@@ -97,7 +97,7 @@
 <meta property="og:url" content="https://cole3.github.io/2017/05/07/Linux-kernel-linear-mmap-area/index.html">
 <meta property="og:site_name" content="cole3's blog">
 <meta property="og:description" content="Linux kernel 线性映射区（32 bit case） 在kernel启动时，mmu从关闭状态到打开状态，需要为mmu准备page table。下面是详细描述建表过程： 建立临时映射表首先提到一个重要的文件head.S，这个文件包含了Kernel startup entry point：     __HEAD ENTRY(stext) 此时的mmu处于关闭状态，不过因为C函数的地址和变量地">
-<meta property="og:updated_time" content="2017-05-07T14:32:46.390Z">
+<meta property="og:updated_time" content="2017-05-07T14:39:00.671Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux kernel linear mmap area">
 <meta name="twitter:description" content="Linux kernel 线性映射区（32 bit case） 在kernel启动时，mmu从关闭状态到打开状态，需要为mmu准备page table。下面是详细描述建表过程： 建立临时映射表首先提到一个重要的文件head.S，这个文件包含了Kernel startup entry point：     __HEAD ENTRY(stext) 此时的mmu处于关闭状态，不过因为C函数的地址和变量地">
@@ -200,7 +200,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
-            Startseite
+            Home
           </a>
         </li>
       
@@ -210,7 +210,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
-            Archiv
+            Archives
           </a>
         </li>
       
@@ -287,7 +287,7 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Veröffentlicht am</span>
+                <span class="post-meta-item-text">Posted on</span>
               
               <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-07T22:13:03+08:00">
                 2017-05-07
@@ -415,7 +415,37 @@ addne    r6, r6, #1 &lt;&lt; SECTION_SHIFT
 strne    r6, [r3]
 </code></pre><p>利用section方式，映射了dtb空间，映射大小为两个sections（2MB），原因是避免dtb跨section的问题。</p>
 <p>至此，临时映射表已经键完，之后call <code>__enable_mmu</code> 函数，调用 <code>__turn_mmu_on</code> 打开MMU，终于进入C world。</p>
-<h2 id="建立最终线性页表"><a href="#建立最终线性页表" class="headerlink" title="建立最终线性页表"></a>建立最终线性页表</h2>
+<h2 id="建立最终线性页表"><a href="#建立最终线性页表" class="headerlink" title="建立最终线性页表"></a>建立最终线性页表</h2><p>进入start_kernel后<br>paging_init</p>
+<p>-&gt; build_mem_type_table</p>
+<p><a href="http://blog.csdn.net/skyflying2012/article/details/51044705" target="_blank" rel="external">http://blog.csdn.net/skyflying2012/article/details/51044705</a></p>
+<p>arm的两级映射为12+8+12=32</p>
+<p>一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB），每个索引占4 bytes，这样16KB大小的页表就可以囊括32位CPU可以寻址到的最大4GB空间</p>
+<p>可以想象，查询这4096个索引，仅需32位虚拟地址的高12位，CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，即获取了该虚拟地址的页目录项。这个过程对于section-mapping和page-mapping都是一样的，那如何区分映射方式呢，关键在与页目录项的最低2bit，如下：</p>
+<p>1 section-mapping </p>
+<p>这一张图很清晰的说明了section-mapping方式的工作原理，根据高12位索引和TTB相加获取的页目录项，MMU发现低2位为10，是section-mapping，取该页目录项的高12位与虚拟地址的低20位拼接，就获取到了物理地址，完成转换。</p>
+<p>2 page-mapping </p>
+<p>这张图说明白了page-mapping方式中4K页的工作原理，是一个二级页表方式，可以细分为5步：<br>（1）MMU由CP15的C0取出TTB（页目录）基址，与VA（虚拟地址）高12位相加，获取该VA在页目录中的对应页目录项值。<br>（2）MMU获取页目录项最低2bit，是01，说明本次映射的1MB数据为4k小页的page-mapping。<br>（3）MMU获取页目录项的高22位（页表是256X4=1K，所以页表基址是1K对齐的）是页表基地址，与VA的中间8位相加，即该VA的对应页表项地址，从而获取VA对应的页表项值（page table entry）<br>（4）MMU获取页表项值的高20位，这就是该4K页对应的物理地址了，与VA低12位相加（也就是4K页内的偏移），这就是VA对应的物理地址了<br>（5）MMU访问该物理地址，进行CPU给出的读写操作</p>
+<p>更新的时机我的理解有4个： </p>
+<p>（1）内核启动初期开启MMU阶段临时内存页表的建立<br>（2）start_kernel中完整的静态内存页表的建立<br>（3）内核空间中动态映射页表的建立，如vmalloc ioremap dma_alloc_coherent等<br>（4）用户空间访问虚拟地址时的缺页异常处理函数do_page_fault</p>
+<p>内核的入口在head.S的stext中，进入start_kernel之前，大概经历了如下几步：</p>
+<p>1.将CPU工作模式设置成svc模式，屏蔽中断</p>
+<p>2.获取CPU ID，然后依据CPU ID查找对应的PROC INFO</p>
+<p>3.校验atags指针</p>
+<p>4.__create_page_tables 创建页表,本文重点的记录一下这部分内容</p>
+<p>页表初始化主要完成了三部分区域的映射。</p>
+<p>初始化过程如下。</p>
+<p>Step 1. 清零页表内容。</p>
+<p>页表的停放在内核镜像前的16K物理空间内，即（phys_offset+text_offset - page_dir_size,phys_offset + text_offset）区间内。</p>
+<p>这里的几个宏定义如下：</p>
+<p>page_dir_size：页表的大小</p>
+<p>phys_offset：代码中要求使用PLAT_PHYS_OFFSET这个宏，总之就是RAM的物理起始地址，比如tq2440中SDRAM挂在BANK6上，对应的值就是BANK6的物理地址。</p>
+<p>text_offset：内核镜像的开始地址</p>
+<p>Step 2, 映射 <strong>turn_mmu_on 到 </strong>turn_mmu_on_end这段空间，这段空间的物理地址与虚拟地址相同，即所谓的平映射。</p>
+<p><strong>turn_mmu_on到</strong>turn_mmu_on_end这段空间实际中就是一个特别短的一个函数，就在同一个1M空间内，对这段空间进行平映射是为了保证在开启MMU时，CPU的PC指针可以正常的执行，直到通过B命令跳转到内核使用的虚拟地址段上来。</p>
+<p>举个例子，假设开启MMU前的一瞬间，PC指向0x100这个物理地址，它的下一条指令，就是0x104，可是开启MMU之后,CPU发出的0x104地址就会被MMU“转译”,不做平映射的话，天知道它跑到哪儿去了。</p>
+<p>Step3. 映射内核虚拟地址空间到物理地址开始处。将内核虚拟地址的开始处（3G，0xc000 0000）到.bss段的结尾处（_end）这段空间，映射到物理RAM地址开始处对应的空间。</p>
+<p>Step4.映射atags附近2M空间到内核虚拟空间同样偏移的2M空间内。之所以映射2M是担心atag指向的内容（传给内核的参数）正好跨过一个section。</p>
+
       
     </div>
 
@@ -508,10 +538,10 @@ strne    r6, [r3]
       
         <ul class="sidebar-nav motion-element">
           <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            Inhaltsverzeichnis
+            Table of Contents
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview">
-            Übersicht
+            Overview
           </li>
         </ul>
       
@@ -532,7 +562,7 @@ strne    r6, [r3]
             <div class="site-state-item site-state-posts">
               <a href="/archives">
                 <span class="site-state-item-count">3</span>
-                <span class="site-state-item-name">Artikel</span>
+                <span class="site-state-item-name">posts</span>
               </a>
             </div>
           
@@ -602,7 +632,7 @@ strne    r6, [r3]
 
 
 <div class="powered-by">
-  Erstellt mit  <a class="theme-link" href="https://hexo.io">Hexo</a>
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
 </div>
 
 <div class="theme-info">
