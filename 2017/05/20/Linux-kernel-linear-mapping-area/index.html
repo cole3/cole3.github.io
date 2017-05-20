@@ -90,20 +90,20 @@
 
 
 
-<meta name="description" content="（32 bit case） arm page tablearm的两级映射为12 + 8 + 12 = 32   一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB） CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，就获得了该虚拟地址的页目录项所在位置。arm的一级页表会包含几种类型，如下图的arm-v7arm translation">
+<meta name="description" content="（32 bit case） ARM page tableARM的两级映射为12 + 8 + 12 = 32   一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB） CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，就获得了该虚拟地址的页目录项所在位置。arm的一级页表会包含几种类型，如下图的arm-v7arm translation">
 <meta name="keywords">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux kernel linear mapping area">
 <meta property="og:url" content="https://cole3.github.io/2017/05/20/Linux-kernel-linear-mapping-area/index.html">
 <meta property="og:site_name" content="cole3's blog">
-<meta property="og:description" content="（32 bit case） arm page tablearm的两级映射为12 + 8 + 12 = 32   一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB） CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，就获得了该虚拟地址的页目录项所在位置。arm的一级页表会包含几种类型，如下图的arm-v7arm translation">
+<meta property="og:description" content="（32 bit case） ARM page tableARM的两级映射为12 + 8 + 12 = 32   一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB） CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，就获得了该虚拟地址的页目录项所在位置。arm的一级页表会包含几种类型，如下图的arm-v7arm translation">
 <meta property="og:image" content="https://cole3.github.io/2017/05/20/Linux-kernel-linear-mapping-area/first_level_table.JPG">
 <meta property="og:image" content="https://cole3.github.io/2017/05/20/Linux-kernel-linear-mapping-area/section_address_translation.JPG">
 <meta property="og:image" content="https://cole3.github.io/2017/05/20/Linux-kernel-linear-mapping-area/small_page_address_translation.JPG">
-<meta property="og:updated_time" content="2017-05-20T15:12:50.609Z">
+<meta property="og:updated_time" content="2017-05-20T15:16:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux kernel linear mapping area">
-<meta name="twitter:description" content="（32 bit case） arm page tablearm的两级映射为12 + 8 + 12 = 32   一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB） CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，就获得了该虚拟地址的页目录项所在位置。arm的一级页表会包含几种类型，如下图的arm-v7arm translation">
+<meta name="twitter:description" content="（32 bit case） ARM page tableARM的两级映射为12 + 8 + 12 = 32   一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB） CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，就获得了该虚拟地址的页目录项所在位置。arm的一级页表会包含几种类型，如下图的arm-v7arm translation">
 <meta name="twitter:image" content="https://cole3.github.io/2017/05/20/Linux-kernel-linear-mapping-area/first_level_table.JPG">
 
 
@@ -329,7 +329,7 @@
 
       
         <p>（32 bit case）</p>
-<h1 id="arm-page-table"><a href="#arm-page-table" class="headerlink" title="arm page table"></a>arm page table</h1><p>arm的两级映射为12 + 8 + 12 = 32  </p>
+<h1 id="ARM-page-table"><a href="#ARM-page-table" class="headerlink" title="ARM page table"></a>ARM page table</h1><p>ARM的两级映射为12 + 8 + 12 = 32  </p>
 <p>一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB）</p>
 <p>CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，就获得了该虚拟地址的页目录项所在位置。arm的一级页表会包含几种类型，如下图的arm-v7arm translation table的结构：<br><img src="/2017/05/20/Linux-kernel-linear-mapping-area/first_level_table.JPG" alt="">  </p>
 <p>linux利用了section和small page来实现内存映射，其中线性映射区是利用section。</p>
@@ -615,7 +615,7 @@ strne    r6, [r3]
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#arm-page-table"><span class="nav-number">1.</span> <span class="nav-text">arm page table</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#section-mapping"><span class="nav-number">1.1.</span> <span class="nav-text">section-mapping</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#page-mapping"><span class="nav-number">1.2.</span> <span class="nav-text">page-mapping</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux-kernel-线性映射区"><span class="nav-number">2.</span> <span class="nav-text">Linux kernel 线性映射区</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#建立临时映射表"><span class="nav-number">2.1.</span> <span class="nav-text">建立临时映射表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#create-page-tables"><span class="nav-number">2.1.1.</span> <span class="nav-text">__create_page_tables</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Create-identity-mapping-to-cater-for-enable-mmu"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">1. Create identity mapping to cater for __enable_mmu</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Map-our-RAM-from-the-start-to-the-end-of-the-kernel"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">2. Map our RAM from the start to the end of the kernel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Then-map-boot-params-address-in-r2-if-specified"><span class="nav-number">2.1.1.3.</span> <span class="nav-text">3. Then map boot params address in r2 if specified</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建立最终线性页表"><span class="nav-number">2.2.</span> <span class="nav-text">建立最终线性页表</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ARM-page-table"><span class="nav-number">1.</span> <span class="nav-text">ARM page table</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#section-mapping"><span class="nav-number">1.1.</span> <span class="nav-text">section-mapping</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#page-mapping"><span class="nav-number">1.2.</span> <span class="nav-text">page-mapping</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux-kernel-线性映射区"><span class="nav-number">2.</span> <span class="nav-text">Linux kernel 线性映射区</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#建立临时映射表"><span class="nav-number">2.1.</span> <span class="nav-text">建立临时映射表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#create-page-tables"><span class="nav-number">2.1.1.</span> <span class="nav-text">__create_page_tables</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Create-identity-mapping-to-cater-for-enable-mmu"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">1. Create identity mapping to cater for __enable_mmu</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Map-our-RAM-from-the-start-to-the-end-of-the-kernel"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">2. Map our RAM from the start to the end of the kernel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Then-map-boot-params-address-in-r2-if-specified"><span class="nav-number">2.1.1.3.</span> <span class="nav-text">3. Then map boot params address in r2 if specified</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建立最终线性页表"><span class="nav-number">2.2.</span> <span class="nav-text">建立最终线性页表</span></a></li></ol></li></ol></div>
             
 
           </div>

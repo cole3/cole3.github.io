@@ -330,7 +330,7 @@
         
           
             <p>（32 bit case）</p>
-<h1 id="arm-page-table"><a href="#arm-page-table" class="headerlink" title="arm page table"></a>arm page table</h1><p>arm的两级映射为12 + 8 + 12 = 32  </p>
+<h1 id="ARM-page-table"><a href="#ARM-page-table" class="headerlink" title="ARM page table"></a>ARM page table</h1><p>ARM的两级映射为12 + 8 + 12 = 32  </p>
 <p>一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB）</p>
 <p>CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，就获得了该虚拟地址的页目录项所在位置。arm的一级页表会包含几种类型，如下图的arm-v7arm translation table的结构：<br><img src="/2017/05/20/Linux-kernel-linear-mapping-area/first_level_table.JPG" alt="">  </p>
 <p>linux利用了section和small page来实现内存映射，其中线性映射区是利用section。</p>
