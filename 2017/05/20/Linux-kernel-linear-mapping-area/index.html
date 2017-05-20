@@ -90,15 +90,21 @@
 
 
 
-<meta name="description" content="Keep going">
-<meta property="og:type" content="website">
-<meta property="og:title" content="cole3's blog">
-<meta property="og:url" content="https://cole3.github.io/index.html">
+<meta name="description" content="（32 bit case） arm page tablearm的两级映射为12 + 8 + 12 = 32   一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB） CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，就获得了该虚拟地址的页目录项所在位置。arm的一级页表会包含几种类型，如下图的arm-v7arm translation">
+<meta name="keywords">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux kernel linear mapping area">
+<meta property="og:url" content="https://cole3.github.io/2017/05/20/Linux-kernel-linear-mapping-area/index.html">
 <meta property="og:site_name" content="cole3's blog">
-<meta property="og:description" content="Keep going">
+<meta property="og:description" content="（32 bit case） arm page tablearm的两级映射为12 + 8 + 12 = 32   一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB） CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，就获得了该虚拟地址的页目录项所在位置。arm的一级页表会包含几种类型，如下图的arm-v7arm translation">
+<meta property="og:image" content="https://cole3.github.io/2017/05/20/Linux-kernel-linear-mapping-area/first_level_table.JPG">
+<meta property="og:image" content="https://cole3.github.io/2017/05/20/Linux-kernel-linear-mapping-area/section_address_translation.JPG">
+<meta property="og:image" content="https://cole3.github.io/2017/05/20/Linux-kernel-linear-mapping-area/small_page_address_translation.JPG">
+<meta property="og:updated_time" content="2017-05-20T15:12:50.609Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="cole3's blog">
-<meta name="twitter:description" content="Keep going">
+<meta name="twitter:title" content="Linux kernel linear mapping area">
+<meta name="twitter:description" content="（32 bit case） arm page tablearm的两级映射为12 + 8 + 12 = 32   一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB） CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，就获得了该虚拟地址的页目录项所在位置。arm的一级页表会包含几种类型，如下图的arm-v7arm translation">
+<meta name="twitter:image" content="https://cole3.github.io/2017/05/20/Linux-kernel-linear-mapping-area/first_level_table.JPG">
 
 
 
@@ -126,13 +132,13 @@
 
 
 
-  <link rel="canonical" href="https://cole3.github.io/"/>
+  <link rel="canonical" href="https://cole3.github.io/2017/05/20/Linux-kernel-linear-mapping-area/"/>
 
 
 
 
 
-  <title>cole3's blog</title>
+  <title>Linux kernel linear mapping area | cole3's blog</title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
@@ -157,9 +163,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-   page-home 
- ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -242,9 +246,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -274,10 +278,7 @@
             
             
               
-                
-                <a class="post-title-link" href="/2017/05/20/Linux-kernel-linear-mapping-area/" itemprop="url">
-                  Linux kernel linear mapping area
-                </a>
+                Linux kernel linear mapping area
               
             
           </h1>
@@ -327,9 +328,7 @@
       
 
       
-        
-          
-            <p>（32 bit case）</p>
+        <p>（32 bit case）</p>
 <h1 id="arm-page-table"><a href="#arm-page-table" class="headerlink" title="arm page table"></a>arm page table</h1><p>arm的两级映射为12 + 8 + 12 = 32  </p>
 <p>一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB）</p>
 <p>CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，就获得了该虚拟地址的页目录项所在位置。arm的一级页表会包含几种类型，如下图的arm-v7arm translation table的结构：<br><img src="/2017/05/20/Linux-kernel-linear-mapping-area/first_level_table.JPG" alt="">  </p>
@@ -462,20 +461,27 @@ strne    r6, [r3]
     flush_pmd_entry(p);
 }
 </code></pre>
-          
+      
+    </div>
+
+    <div>
+      
         
+
       
     </div>
 
     <div>
       
-    </div>
+        
 
-    <div>
       
     </div>
 
     <div>
+      
+        
+
       
     </div>
 
@@ -483,269 +489,38 @@ strne    r6, [r3]
       
 
       
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://cole3.github.io/2017/04/23/Welcome-cole3-s-blog/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="cole3">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="cole3's blog">
-    </span>
-
-    
-      <header class="post-header">
-
         
-        
-          <h1 class="post-title" itemprop="name headline">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
             
-              
-                
-                <a class="post-title-link" href="/2017/04/23/Welcome-cole3-s-blog/" itemprop="url">
-                  Welcome cole3's blog
-                </a>
-              
+              <a href="/2017/04/23/Welcome-cole3-s-blog/" rel="prev" title="Welcome cole3's blog">
+                Welcome cole3's blog <i class="fa fa-chevron-right"></i>
+              </a>
             
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Veröffentlicht am</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-23T22:17:43+08:00">
-                2017-04-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
-            <p>你好，欢迎来到cole3的个人技术博客</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </article>
 
 
-    
-      
 
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://cole3.github.io/2017/04/23/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="cole3">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="cole3's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/04/23/hello-world/" itemprop="url">
-                  Hello World
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Veröffentlicht am</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-23T21:52:56+08:00">
-                2017-04-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-          
-        
+    <div class="post-spread">
       
     </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-  </section>
-
-  
+  </div>
 
 
           </div>
@@ -753,6 +528,10 @@ strne    r6, [r3]
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -772,8 +551,17 @@ strne    r6, [r3]
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.gif"
@@ -817,6 +605,22 @@ strne    r6, [r3]
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#arm-page-table"><span class="nav-number">1.</span> <span class="nav-text">arm page table</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#section-mapping"><span class="nav-number">1.1.</span> <span class="nav-text">section-mapping</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#page-mapping"><span class="nav-number">1.2.</span> <span class="nav-text">page-mapping</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux-kernel-线性映射区"><span class="nav-number">2.</span> <span class="nav-text">Linux kernel 线性映射区</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#建立临时映射表"><span class="nav-number">2.1.</span> <span class="nav-text">建立临时映射表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#create-page-tables"><span class="nav-number">2.1.1.</span> <span class="nav-text">__create_page_tables</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Create-identity-mapping-to-cater-for-enable-mmu"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">1. Create identity mapping to cater for __enable_mmu</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Map-our-RAM-from-the-start-to-the-end-of-the-kernel"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">2. Map our RAM from the start to the end of the kernel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Then-map-boot-params-address-in-r2-if-specified"><span class="nav-number">2.1.1.3.</span> <span class="nav-text">3. Then map boot params address in r2 if specified</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建立最终线性页表"><span class="nav-number">2.2.</span> <span class="nav-text">建立最终线性页表</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -930,6 +734,10 @@ strne    r6, [r3]
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
 
   
 
