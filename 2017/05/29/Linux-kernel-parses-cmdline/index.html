@@ -90,15 +90,17 @@
 
 
 
-<meta name="description" content="Keep going">
-<meta property="og:type" content="website">
-<meta property="og:title" content="cole3's blog">
-<meta property="og:url" content="https://cole3.github.io/index.html">
+<meta name="description" content="Linux kernel parses cmdlineLinux kernel利用静态数组存储cmdline，arm默认1024 Bytes，arm64默认2048 Bytes。 ./arch/arm/include/uapi/asm/setup.h:19:#define COMMAND_LINE_SIZE 1024 ./arch/arm64/include/uapi/asm/setup.h:24">
+<meta name="keywords">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux kernel parses cmdline">
+<meta property="og:url" content="https://cole3.github.io/2017/05/29/Linux-kernel-parses-cmdline/index.html">
 <meta property="og:site_name" content="cole3's blog">
-<meta property="og:description" content="Keep going">
+<meta property="og:description" content="Linux kernel parses cmdlineLinux kernel利用静态数组存储cmdline，arm默认1024 Bytes，arm64默认2048 Bytes。 ./arch/arm/include/uapi/asm/setup.h:19:#define COMMAND_LINE_SIZE 1024 ./arch/arm64/include/uapi/asm/setup.h:24">
+<meta property="og:updated_time" content="2017-05-29T12:22:09.546Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="cole3's blog">
-<meta name="twitter:description" content="Keep going">
+<meta name="twitter:title" content="Linux kernel parses cmdline">
+<meta name="twitter:description" content="Linux kernel parses cmdlineLinux kernel利用静态数组存储cmdline，arm默认1024 Bytes，arm64默认2048 Bytes。 ./arch/arm/include/uapi/asm/setup.h:19:#define COMMAND_LINE_SIZE 1024 ./arch/arm64/include/uapi/asm/setup.h:24">
 
 
 
@@ -126,13 +128,13 @@
 
 
 
-  <link rel="canonical" href="https://cole3.github.io/"/>
+  <link rel="canonical" href="https://cole3.github.io/2017/05/29/Linux-kernel-parses-cmdline/"/>
 
 
 
 
 
-  <title>cole3's blog</title>
+  <title>Linux kernel parses cmdline | cole3's blog</title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
@@ -157,9 +159,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-   page-home 
- ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -232,9 +232,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -264,10 +264,7 @@
             
             
               
-                
-                <a class="post-title-link" href="/2017/05/29/Linux-kernel-parses-cmdline/" itemprop="url">
-                  Linux kernel parses cmdline
-                </a>
+                Linux kernel parses cmdline
               
             
           </h1>
@@ -317,9 +314,7 @@
       
 
       
-        
-          
-            <h1 id="Linux-kernel-parses-cmdline"><a href="#Linux-kernel-parses-cmdline" class="headerlink" title="Linux kernel parses cmdline"></a>Linux kernel parses cmdline</h1><p>Linux kernel利用静态数组存储cmdline，arm默认1024 Bytes，arm64默认2048 Bytes。</p>
+        <h1 id="Linux-kernel-parses-cmdline"><a href="#Linux-kernel-parses-cmdline" class="headerlink" title="Linux kernel parses cmdline"></a>Linux kernel parses cmdline</h1><p>Linux kernel利用静态数组存储cmdline，arm默认1024 Bytes，arm64默认2048 Bytes。</p>
 <pre><code>./arch/arm/include/uapi/asm/setup.h:19:#define COMMAND_LINE_SIZE 1024
 ./arch/arm64/include/uapi/asm/setup.h:24:#define COMMAND_LINE_SIZE 2048
 </code></pre><h2 id="restore-cmdline"><a href="#restore-cmdline" class="headerlink" title="restore cmdline"></a>restore cmdline</h2><p>kernel启动后获取bootargs的flow如下：  </p>
@@ -541,20 +536,27 @@ STANDARD_PARAM_DEF(ulong, unsigned long, &quot;%lu&quot;, unsigned long, strict_
         VMLINUX_SYMBOL(__setup_end) = .;
 </code></pre><p>__setup函数之前有提过，在.init.setup中构建解析结构体。</p>
 
-          
+      
+    </div>
+
+    <div>
+      
         
+
       
     </div>
 
     <div>
       
-    </div>
+        
 
-    <div>
       
     </div>
 
     <div>
+      
+        
+
       
     </div>
 
@@ -562,520 +564,38 @@ STANDARD_PARAM_DEF(ulong, unsigned long, &quot;%lu&quot;, unsigned long, strict_
       
 
       
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://cole3.github.io/2017/05/20/Linux-kernel-linear-mapping-area/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="cole3">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="cole3's blog">
-    </span>
-
-    
-      <header class="post-header">
-
         
-        
-          <h1 class="post-title" itemprop="name headline">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
             
-              
-                
-                <a class="post-title-link" href="/2017/05/20/Linux-kernel-linear-mapping-area/" itemprop="url">
-                  Linux kernel linear mapping area
-                </a>
-              
+              <a href="/2017/05/20/Linux-kernel-linear-mapping-area/" rel="prev" title="Linux kernel linear mapping area">
+                Linux kernel linear mapping area <i class="fa fa-chevron-right"></i>
+              </a>
             
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Veröffentlicht am</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-20T21:53:34+08:00">
-                2017-05-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
-            <p>（32 bit case）</p>
-<h1 id="ARM-page-table"><a href="#ARM-page-table" class="headerlink" title="ARM page table"></a>ARM page table</h1><p>ARM的两级映射为12 + 8 + 12 = 32  </p>
-<p>一级页表（也可以称为页目录）地址，该页表总共有4096个索引（4096 × 1MB = 4GB）</p>
-<p>CPU首先获取页目录基地址（TTB），加上待转换虚拟地址的高12位，就获得了该虚拟地址的页目录项所在位置。arm的一级页表会包含几种类型，如下图的arm-v7arm translation table的结构：<br><img src="/2017/05/20/Linux-kernel-linear-mapping-area/first_level_table.JPG" alt="">  </p>
-<p>linux利用了section和small page来实现内存映射，其中线性映射区是利用section。</p>
-<p>利用表项的bits[1:0]区别了下级页表的类型：  </p>
-<blockquote>
-<p>0b01, Page table<br>The descriptor gives the address of a second-level translation table, that specifies the mapping of the associated 1MByte VA range.</p>
-<p>0b10, Section or Supersection<br>The descriptor gives the base address of the Section or Supersection. Bit[18] determines whether the entry describes a Section or a Supersection.</p>
-</blockquote>
-<h2 id="section-mapping"><a href="#section-mapping" class="headerlink" title="section-mapping"></a>section-mapping</h2><p><img src="/2017/05/20/Linux-kernel-linear-mapping-area/section_address_translation.JPG" alt="section address translation">  </p>
-<p>MMU从CP15的C0中的TTB得到基址，加上虚拟地址的高12位，得到了页目录项，MMU发现低2位为10，确定是section-mapping，就会取该页目录项的高12位与虚拟地址的低20位拼接，便获取到了物理地址。</p>
-<h2 id="page-mapping"><a href="#page-mapping" class="headerlink" title="page-mapping"></a>page-mapping</h2><p><img src="/2017/05/20/Linux-kernel-linear-mapping-area/small_page_address_translation.JPG" alt="small page address translation"></p>
-<p>4KB page-mapping 是二级页表方式：  </p>
-<ol>
-<li>MMU利用TTB（页目录）基址，与虚拟地址的高12位相加，得到页目录项值    </li>
-<li>MMU获取页目录项最低2bit是01，说明本次映射的1MB数据为4KB小页的page-mapping  </li>
-<li>MMU获取页目录项的高22位（页表是256X4=1K，所以页表基址是1K对齐的）是页表基地址，与虚拟地址的中间8位相加，即该虚拟地址的对应页表项地址，从而获取虚拟地址对应的页表项值（page table entry）   </li>
-<li>MMU获取页表项值的高20位，这就是该4K页对应的物理地址了，与虚拟地址低12位相加（也就是4KB页内的偏移），得到虚拟地址对应的物理地址  </li>
-</ol>
-<h1 id="Linux-kernel-线性映射区"><a href="#Linux-kernel-线性映射区" class="headerlink" title="Linux kernel 线性映射区"></a>Linux kernel 线性映射区</h1><p>在kernel启动时，mmu从关闭状态到打开状态，需要为mmu准备page table。下面是详细描述建表过程：  </p>
-<h2 id="建立临时映射表"><a href="#建立临时映射表" class="headerlink" title="建立临时映射表"></a>建立临时映射表</h2><p>首先提到一个重要的文件head.S，这个文件包含了Kernel startup entry point：  </p>
-<pre><code>    __HEAD
-ENTRY(stext)
-</code></pre><p>此时的mmu处于关闭状态，不过因为C函数的地址和变量地址都是虚拟地址，所以在进入C world之前，要建立映射表，然后开机mmu，在stext中有体现：  </p>
-<pre><code>    bl    __create_page_tables
-//...
-1:    b    __enable_mmu
-</code></pre><h3 id="create-page-tables"><a href="#create-page-tables" class="headerlink" title="__create_page_tables"></a>__create_page_tables</h3><p>这个函数的作用是建立mmu的page table，当然在这段汇编里，只建立能刚好满足kernel运行的page table，剩下的交给强大的C语言完成，所以这个页表被叫做“临时映射表”。  </p>
-<p>这个函数分成三大部分：  </p>
-<ol>
-<li>Create identity mapping to cater for __enable_mmu</li>
-<li>Map our RAM from the start to the end of the kernel</li>
-<li>Then map boot params address in r2 if specified</li>
-</ol>
-<h4 id="1-Create-identity-mapping-to-cater-for-enable-mmu"><a href="#1-Create-identity-mapping-to-cater-for-enable-mmu" class="headerlink" title="1. Create identity mapping to cater for __enable_mmu"></a>1. Create identity mapping to cater for __enable_mmu</h4><pre><code>    /*
-     * Create identity mapping to cater for __enable_mmu.
-     * This identity mapping will be removed by paging_init().
-     */
-    adr    r0, __turn_mmu_on_loc
-    ldmia    r0, {r3, r5, r6}
-    sub    r0, r0, r3            @ virt-&gt;phys offset
-    add    r5, r5, r0            @ phys __turn_mmu_on
-    add    r6, r6, r0            @ phys __turn_mmu_on_end
-    mov    r5, r5, lsr #SECTION_SHIFT
-    mov    r6, r6, lsr #SECTION_SHIFT
-
-1:    orr    r3, r7, r5, lsl #SECTION_SHIFT    @ flags + kernel base //制作pgd表项
-    str    r3, [r4, r5, lsl #PMD_ORDER]    @ identity mapping //存储pgd表项
-    cmp    r5, r6
-    addlo    r5, r5, #1            @ next section
-    blo    1b
-</code></pre><p>创建同一映射，也被称为平映射，该映射的特点是：虚拟地址和物理地址相同。  </p>
-<p>映射区间为 <code>__turn_mmu_on</code> 到 <code>__turn_mmu_on_end</code>，按section方式进行映射1MB空间（如果该函数敲好在1MB边界上，则映射2MB）。<code>__turn_mmu_on</code>函数实现：</p>
-<pre><code>/*
- * Enable the MMU.  This completely changes the structure of the visible
- * memory space.  You will not be able to trace execution through this.
- * If you have an enquiry about this, *please* check the linux-arm-kernel
- * mailing list archives BEFORE sending another post to the list.
- *
- *  r0  = cp#15 control register
- *  r1  = machine ID
- *  r2  = atags or dtb pointer
- *  r9  = processor ID
- *  r13 = *virtual* address to jump to upon completion
- *
- * other registers depend on the function called upon completion
- */
-    .align    5
-    .pushsection    .idmap.text, &quot;ax&quot;
-ENTRY(__turn_mmu_on)
-    mov    r0, r0
-    instr_sync
-    mcr    p15, 0, r0, c1, c0, 0        @ write control reg
-    mrc    p15, 0, r3, c0, c0, 0        @ read id reg
-    instr_sync
-    mov    r3, r3
-    mov    r3, r13
-    mov    pc, r3
-__turn_mmu_on_end:
-ENDPROC(__turn_mmu_on)
-    .popsection
-</code></pre><p>在write control reg之后，mmu就被打开了，下条指令的PC值，指向的位置仍然是之前的物理地址+4。当cpu执行新的PC值指向的指令时，就要利用MMU访问内存，由于之前制作了虚拟地址和物理地址的同一映射，所以新的物理地址和虚拟地址相同，所以平滑过渡了打开mmu造成的地址映射问题。</p>
-<h4 id="2-Map-our-RAM-from-the-start-to-the-end-of-the-kernel"><a href="#2-Map-our-RAM-from-the-start-to-the-end-of-the-kernel" class="headerlink" title="2. Map our RAM from the start to the end of the kernel"></a>2. Map our RAM from the start to the end of the kernel</h4><pre><code>    /*
-     * Map our RAM from the start to the end of the kernel .bss section.
-     */
-    add    r0, r4, #PAGE_OFFSET &gt;&gt; (SECTION_SHIFT - PMD_ORDER)
-    ldr    r6, =(_end - 1)
-    orr    r3, r8, r7 //制作pgd表项内容
-    add    r6, r4, r6, lsr #(SECTION_SHIFT - PMD_ORDER)
-1:    str    r3, [r0], #1 &lt;&lt; PMD_ORDER //存储pgd表项
-    add    r3, r3, #1 &lt;&lt; SECTION_SHIFT
-    cmp    r0, r6
-    bls    1b
-</code></pre><p>利用section方式，完成kernel线性区的映射，线性区的范围是PAGE_OFFSET到kernel .bss段的结束。</p>
-<h4 id="3-Then-map-boot-params-address-in-r2-if-specified"><a href="#3-Then-map-boot-params-address-in-r2-if-specified" class="headerlink" title="3. Then map boot params address in r2 if specified"></a>3. Then map boot params address in r2 if specified</h4><pre><code>/*
- * Then map boot params address in r2 if specified.
- * We map 2 sections in case the ATAGs/DTB crosses a section boundary.
- */
-mov    r0, r2, lsr #SECTION_SHIFT
-movs    r0, r0, lsl #SECTION_SHIFT
-subne    r3, r0, r8
-addne    r3, r3, #PAGE_OFFSET
-addne    r3, r4, r3, lsr #(SECTION_SHIFT - PMD_ORDER)
-orrne    r6, r7, r0
-strne    r6, [r3], #1 &lt;&lt; PMD_ORDER
-addne    r6, r6, #1 &lt;&lt; SECTION_SHIFT
-strne    r6, [r3]
-</code></pre><p>利用section方式，映射了dtb空间，映射大小为两个sections（2MB），原因是避免dtb跨section的问题。  </p>
-<p>至此，临时映射表已经键完，之后call <code>__enable_mmu</code> 函数，调用 <code>__turn_mmu_on</code> 打开MMU，终于进入C world。</p>
-<h2 id="建立最终线性页表"><a href="#建立最终线性页表" class="headerlink" title="建立最终线性页表"></a>建立最终线性页表</h2><pre><code>| start_kernel  
-\--+ setup_arch  
-   \--+ paging_init
-      \--+ map_lowmem
-         \--+ create_mapping
-            \--+ alloc_init_pud
-               \--+ alloc_init_pmd
-                  \--+ __map_init_section  
-</code></pre><p>针对kernel线性区，重新做了一遍section-mapping  </p>
-<pre><code>static void __init __map_init_section(pmd_t *pmd, unsigned long addr,
-            unsigned long end, phys_addr_t phys,
-            const struct mem_type *type)
-{
-    pmd_t *p = pmd;
-
-    do {
-        *pmd = __pmd(phys | type-&gt;prot_sect);
-        phys += SECTION_SIZE;
-    } while (pmd++, addr += SECTION_SIZE, addr != end);
-
-    flush_pmd_entry(p);
-}
-</code></pre>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </article>
 
 
-    
-      
 
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://cole3.github.io/2017/04/23/Welcome-cole3-s-blog/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="cole3">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="cole3's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/04/23/Welcome-cole3-s-blog/" itemprop="url">
-                  Welcome cole3's blog
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Veröffentlicht am</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-23T22:17:43+08:00">
-                2017-04-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>你好，欢迎来到cole3的个人技术博客</p>
-
-          
-        
+    <div class="post-spread">
       
     </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://cole3.github.io/2017/04/23/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="cole3">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="cole3's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/04/23/hello-world/" itemprop="url">
-                  Hello World
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Veröffentlicht am</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-23T21:52:56+08:00">
-                2017-04-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-  </section>
-
-  
+  </div>
 
 
           </div>
@@ -1083,6 +603,10 @@ strne    r6, [r3]
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -1102,8 +626,17 @@ strne    r6, [r3]
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.gif"
@@ -1147,6 +680,22 @@ strne    r6, [r3]
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux-kernel-parses-cmdline"><span class="nav-number">1.</span> <span class="nav-text">Linux kernel parses cmdline</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#restore-cmdline"><span class="nav-number">1.1.</span> <span class="nav-text">restore cmdline</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#early-param-parse"><span class="nav-number">1.2.</span> <span class="nav-text">early_param parse</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#module-param-named"><span class="nav-number">1.3.</span> <span class="nav-text">module_param_named</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#setup"><span class="nav-number">1.4.</span> <span class="nav-text">__setup</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -1260,6 +809,10 @@ strne    r6, [r3]
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
 
   
 
