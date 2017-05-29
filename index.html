@@ -319,10 +319,10 @@
       
         
           
-            <h1 id="Linux-kernel-parses-cmdline"><a href="#Linux-kernel-parses-cmdline" class="headerlink" title="Linux kernel parses cmdline"></a>Linux kernel parses cmdline</h1><p>Linux kernel利用静态数组存储cmdline，arm默认1024 Bytes，arm64默认2048 Bytes。</p>
+            <p>Linux kernel利用静态数组存储cmdline，arm默认1024 Bytes，arm64默认2048 Bytes。</p>
 <pre><code>./arch/arm/include/uapi/asm/setup.h:19:#define COMMAND_LINE_SIZE 1024
 ./arch/arm64/include/uapi/asm/setup.h:24:#define COMMAND_LINE_SIZE 2048
-</code></pre><h2 id="restore-cmdline"><a href="#restore-cmdline" class="headerlink" title="restore cmdline"></a>restore cmdline</h2><p>kernel启动后获取bootargs的flow如下：  </p>
+</code></pre><h1 id="restore-cmdline"><a href="#restore-cmdline" class="headerlink" title="restore cmdline"></a>restore cmdline</h1><p>kernel启动后获取bootargs的flow如下：  </p>
 <pre><code>+start_kernel
 |--+setup_arch
 |----+setup_machine_fdt
@@ -341,7 +341,7 @@ char __initdata boot_command_line[COMMAND_LINE_SIZE];
 |--+setup_command_line
 </code></pre><p>上述调用，会将cmdline转存到saved_command_line中，后者为/proc/cmdline提供数据支持。</p>
 <p>kernel参数分成三种类型：early_param，module_param_named，__setup。cmdline会被逐层进行解析。</p>
-<h2 id="early-param-parse"><a href="#early-param-parse" class="headerlink" title="early_param parse"></a>early_param parse</h2><p>early_param注册的参数是最早被解析的:</p>
+<h1 id="early-param-parse"><a href="#early-param-parse" class="headerlink" title="early_param parse"></a>early_param parse</h1><p>early_param注册的参数是最早被解析的:</p>
 <pre><code>+start_kernel
 |--+setup_arch
 |----+parse_early_param
@@ -401,7 +401,7 @@ static int __init do_early_param(char *param, char *val, const char *unused)
 #define early_param(str, fn)                    \
     __setup_param(str, fn, fn, 1)
 </code></pre><p>从上面的code，可以看出early_param和__setup都会构建结构体在.init.setup中，不同的是early_param会置位early flag，所以在do_early_param中，会对这部分进行解析。</p>
-<h2 id="module-param-named"><a href="#module-param-named" class="headerlink" title="module_param_named"></a>module_param_named</h2><p>[include/linux/moduleparam.h]</p>
+<h1 id="module-param-named"><a href="#module-param-named" class="headerlink" title="module_param_named"></a>module_param_named</h1><p>[include/linux/moduleparam.h]</p>
 <pre><code>/**
  * module_param_named - typesafe helper for a renamed module/cmdline parameter
  * @name: a valid C identifier which is the parameter name.
@@ -497,7 +497,7 @@ STANDARD_PARAM_DEF(ulong, unsigned long, &quot;%lu&quot;, unsigned long, strict_
 ./kernel/params.c:349:struct kernel_param_ops param_ops_invbool = {
 ./kernel/params.c:372:struct kernel_param_ops param_ops_bint = {
 ./kernel/params.c:496:struct kernel_param_ops param_ops_string = {
-</code></pre><h2 id="setup"><a href="#setup" class="headerlink" title="__setup"></a>__setup</h2><pre><code>+start_kernel
+</code></pre><h1 id="setup"><a href="#setup" class="headerlink" title="__setup"></a>__setup</h1><pre><code>+start_kernel
 |--+parse_early_param
 |----+parse_args(&quot;Booting kernel&quot;, static_command_line, __start___param,
 |       __stop___param - __start___param,
